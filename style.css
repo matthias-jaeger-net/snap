@@ -59,7 +59,7 @@ canvas {
 #shutter {
     z-index: 2;
     position: absolute;
-    bottom: 80px;
+    bottom: calc(40px - env(safe-area-inset-bottom));
     left: 50%;
     transform: translateX(-50%);
     width: 80px;
