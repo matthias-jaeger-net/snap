@@ -19,15 +19,15 @@
                 background: black;
             }
 
-            /* Canvas will fill the container */
-            canvas {
+            /* Canvas behind UI */
+            #camera-container canvas {
                 position: absolute;
                 top: 0;
                 left: 0;
                 z-index: 0;
             }
 
-            /* Rule of thirds overlay */
+            /* Rule-of-thirds grid */
             .grid-line {
                 position: absolute;
                 z-index: 1;
@@ -40,7 +40,6 @@
                 width: 2px;
                 height: 100%;
             }
-
             #v1 {
                 left: 33.33%;
             }
@@ -54,7 +53,6 @@
                 height: 2px;
                 width: 100%;
             }
-
             #h1 {
                 top: 33.33%;
             }
@@ -92,31 +90,73 @@
                 background: white;
                 opacity: 0;
                 pointer-events: none;
+                z-index: 2;
+            }
+
+            /* Captured photo overlay (iOS) */
+            #photo-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: black;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 3;
+                display: none;
+            }
+
+            #photo-overlay img {
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: contain;
+            }
+
+            #photo-overlay p {
+                position: absolute;
+                bottom: 20px;
+                color: white;
+                font-size: 16px;
+                text-align: center;
+                width: 100%;
             }
         </style>
     </head>
 
     <body>
         <div id="camera-container">
+            <!-- Rule-of-thirds grid -->
             <div id="v1" class="grid-line"></div>
             <div id="v2" class="grid-line"></div>
             <div id="h1" class="grid-line"></div>
             <div id="h2" class="grid-line"></div>
 
+            <!-- Shutter button -->
             <div id="shutter"></div>
+
+            <!-- Flash effect -->
             <div id="flash"></div>
+
+            <!-- iOS photo overlay -->
+            <div id="photo-overlay">
+                <img id="captured-photo" src="" />
+                <p>Tap and hold the photo to save it</p>
+            </div>
         </div>
 
         <script>
             let cam;
             let flashEl = document.getElementById("flash");
+            let overlay = document.getElementById("photo-overlay");
+            let capturedImg = document.getElementById("captured-photo");
 
             // Setup p5 canvas
             function setup() {
                 const canvas = createCanvas(windowWidth, windowHeight);
                 canvas.parent("camera-container");
 
-                // Use rear camera, audio off
                 cam = createCapture({
                     video: { facingMode: "environment" },
                     audio: false,
@@ -151,7 +191,6 @@
                 );
             }
 
-            // Handle window resize
             function windowResized() {
                 resizeCanvas(windowWidth, windowHeight);
             }
@@ -162,22 +201,38 @@
                 .addEventListener("click", takePhoto);
 
             function takePhoto() {
-                // Flash effect
+                // Flash animation
                 flashEl.style.opacity = 1;
                 setTimeout(() => (flashEl.style.opacity = 0), 100);
 
-                // Capture image from canvas
+                // Capture canvas image
                 let img = get();
                 let data = img.canvas.toDataURL("image/png");
 
-                // Use anchor to trigger download
-                let a = document.createElement("a");
-                a.href = data;
-                a.download = "photo.png";
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
+                // Detect iOS
+                let isIOS =
+                    /iPad|iPhone|iPod/.test(navigator.userAgent) &&
+                    !window.MSStream;
+
+                if (isIOS) {
+                    // Show overlay with photo for long-press save
+                    capturedImg.src = data;
+                    overlay.style.display = "flex";
+                } else {
+                    // Normal download for Android/Desktop
+                    let a = document.createElement("a");
+                    a.href = data;
+                    a.download = "photo.png";
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                }
             }
+
+            // Click overlay to dismiss
+            overlay.addEventListener("click", () => {
+                overlay.style.display = "none";
+            });
         </script>
     </body>
 </html>
