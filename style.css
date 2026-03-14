@@ -24,7 +24,7 @@ canvas {
 .grid-line {
     position: absolute;
     z-index: 1;
-    background: rgba(255, 255, 255, 0.5);
+    background: rgba(232, 224, 224, 0.5);
 }
 
 /* Vertical lines */
@@ -59,11 +59,11 @@ canvas {
 #shutter {
     z-index: 2;
     position: absolute;
-    bottom: 40px;
+    bottom: 80px;
     left: 50%;
     transform: translateX(-50%);
-    width: 70px;
-    height: 70px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
     border: 4px solid white;
     background: rgba(255, 255, 255, 0.1);
