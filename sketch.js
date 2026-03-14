@@ -1,6 +1,9 @@
 let cam;
 let flashEl = document.getElementById("flash");
 
+const shutter = document.getElementById("shutter");
+shutter.style.bottom = `${window.innerHeight * 0.05}px`;
+
 // Setup p5 canvas
 function setup() {
     const canvas = createCanvas(windowWidth, windowHeight);
@@ -44,10 +47,11 @@ function draw() {
 // Handle window resize
 function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
+    shutter.style.bottom = `${window.innerHeight * 0.05}px`;
 }
 
 // Shutter button click
-document.getElementById("shutter").addEventListener("click", takePhoto);
+shutter.addEventListener("click", takePhoto);
 
 function takePhoto() {
     // Flash effect
