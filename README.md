@@ -1,10 +1,11 @@
-# Mobile Camera Web App
-
-https://matthias-jaeger-net.github.io/snap/
+# snap
 
 A camera web app** built with **p5.js** and modern CSS. Designed to work reliably on **iOS Safari**, **Android Chrome**, and desktop browsers.  
 
-It features:  
+https://matthias-jaeger-net.github.io/snap/
+
+
+## Ffeatures:  
 
 - Fullscreen camera preview with **rear camera**  
 - **Shutter button** above home indicator / safe area  
