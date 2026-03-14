@@ -21,7 +21,12 @@
             function setup() {
                 createCanvas(windowWidth, windowHeight);
 
-                cam = createCapture(VIDEO);
+                cam = createCapture({
+                    video: {
+                        facingMode: "environment", // back camera
+                    },
+                });
+
                 cam.hide();
             }
 
