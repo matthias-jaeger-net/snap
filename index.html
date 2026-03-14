@@ -1,32 +1,126 @@
 <!doctype html>
 <html lang="en">
     <head>
+        <meta charset="utf-8" />
         <script src="https://cdn.jsdelivr.net/npm/p5@1.11.11/lib/p5.js"></script>
 
         <style>
             body {
                 margin: 0;
                 overflow: hidden;
+                font-family: sans-serif;
+            }
+
+            /* Camera container */
+            #camera-container {
+                position: relative;
+                width: 100vw;
+                height: 100vh;
+                background: black;
+            }
+
+            /* Canvas will fill the container */
+            canvas {
+                position: absolute;
+                top: 0;
+                left: 0;
+                z-index: 0;
+            }
+
+            /* Rule of thirds overlay */
+            .grid-line {
+                position: absolute;
+                z-index: 1;
+                background: rgba(255, 255, 255, 0.5);
+            }
+
+            /* Vertical lines */
+            #v1,
+            #v2 {
+                width: 2px;
+                height: 100%;
+            }
+
+            #v1 {
+                left: 33.33%;
+            }
+            #v2 {
+                left: 66.66%;
+            }
+
+            /* Horizontal lines */
+            #h1,
+            #h2 {
+                height: 2px;
+                width: 100%;
+            }
+
+            #h1 {
+                top: 33.33%;
+            }
+            #h2 {
+                top: 66.66%;
+            }
+
+            /* Shutter button */
+            #shutter {
+                z-index: 2;
+                position: absolute;
+                bottom: 40px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 70px;
+                height: 70px;
+                border-radius: 50%;
+                border: 4px solid white;
+                background: rgba(255, 255, 255, 0.1);
+                cursor: pointer;
+                transition: background 0.1s;
+            }
+
+            #shutter:active {
+                background: rgba(255, 255, 255, 0.5);
+            }
+
+            /* Flash effect */
+            #flash {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: white;
+                opacity: 0;
+                pointer-events: none;
             }
         </style>
-
-        <meta charset="utf-8" />
     </head>
 
     <body>
+        <div id="camera-container">
+            <div id="v1" class="grid-line"></div>
+            <div id="v2" class="grid-line"></div>
+            <div id="h1" class="grid-line"></div>
+            <div id="h2" class="grid-line"></div>
+
+            <div id="shutter"></div>
+            <div id="flash"></div>
+        </div>
+
         <script>
             let cam;
-            let flash = 0;
+            let flashEl = document.getElementById("flash");
 
+            // Setup p5 canvas
             function setup() {
-                createCanvas(windowWidth, windowHeight);
+                const canvas = createCanvas(windowWidth, windowHeight);
+                canvas.parent("camera-container");
 
+                // Use rear camera, audio off
                 cam = createCapture({
-                    video: {
-                        facingMode: "environment", // back camera
-                    },
+                    video: { facingMode: "environment" },
+                    audio: false,
                 });
-
                 cam.hide();
             }
 
@@ -53,54 +147,34 @@
                     drawWidth,
                     drawHeight,
                 );
-
-                // rule of thirds
-                stroke(180);
-                strokeWeight(2);
-                line(width / 3, 0, width / 3, height);
-                line((2 * width) / 3, 0, (2 * width) / 3, height);
-                line(0, height / 3, width, height / 3);
-                line(0, (2 * height) / 3, width, (2 * height) / 3);
-
-                // shutter flash
-                if (flash > 0) {
-                    fill(255, flash);
-                    noStroke();
-                    rect(0, 0, width, height);
-                    flash -= 20;
-                }
-
-                // camera shutter button
-                noFill();
-                stroke(255);
-                strokeWeight(4);
-                circle(width / 2, height - 80, 70);
             }
 
-            function keyPressed() {
-                if (key === " ") {
-                    takePhoto();
-                }
-            }
-
-            function mousePressed() {
-                if (dist(mouseX, mouseY, width / 2, height - 80) < 35) {
-                    takePhoto();
-                }
-            }
-
-            function takePhoto() {
-                flash = 255;
-
-                let img = get(); // capture canvas
-                let data = img.canvas.toDataURL("image/png");
-
-                let w = window.open("");
-                w.document.write('<img src="' + data + '" style="width:100%">');
-            }
-
+            // Handle window resize
             function windowResized() {
                 resizeCanvas(windowWidth, windowHeight);
+            }
+
+            // Shutter button click
+            document
+                .getElementById("shutter")
+                .addEventListener("click", takePhoto);
+
+            function takePhoto() {
+                // Flash effect
+                flashEl.style.opacity = 1;
+                setTimeout(() => (flashEl.style.opacity = 0), 100);
+
+                // Capture image from canvas
+                let img = get();
+                let data = img.canvas.toDataURL("image/png");
+
+                // Use anchor to trigger download
+                let a = document.createElement("a");
+                a.href = data;
+                a.download = "photo.png";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
             }
         </script>
     </body>
