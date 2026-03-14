@@ -59,18 +59,19 @@ canvas {
 #shutter {
     z-index: 2;
     position: absolute;
-    bottom: calc(40px - env(safe-area-inset-bottom));
     left: 50%;
     transform: translateX(-50%);
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
     border: 4px solid white;
     background: rgba(255, 255, 255, 0.1);
     cursor: pointer;
     transition: background 0.1s;
-}
 
+    /* iOS safe area at bottom */
+    bottom: calc(20px + env(safe-area-inset-bottom));
+}
 #shutter:active {
     background: rgba(255, 255, 255, 0.5);
 }
