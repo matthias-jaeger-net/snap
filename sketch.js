@@ -1,8 +1,14 @@
 let cam;
 let flashEl = document.getElementById("flash");
-
 const shutter = document.getElementById("shutter");
-shutter.style.bottom = `${window.innerHeight * 0.05}px`;
+
+// Function to position shutter dynamically
+function positionShutter() {
+    const margin = 20; // px above bottom of viewport
+    // Position relative to visible viewport top
+    const y = window.innerHeight - shutter.offsetHeight - margin;
+    shutter.style.top = `${y}px`;
+}
 
 // Setup p5 canvas
 function setup() {
@@ -14,9 +20,11 @@ function setup() {
         video: { facingMode: "environment" },
         audio: false,
     });
-
     cam.elt.muted = true;
     cam.hide();
+
+    // Initial shutter position
+    positionShutter();
 }
 
 function draw() {
@@ -44,10 +52,10 @@ function draw() {
     );
 }
 
-// Handle window resize
+// Handle window resize / orientation changes
 function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
-    shutter.style.bottom = `${window.innerHeight * 0.05}px`;
+    positionShutter(); // recalc shutter position
 }
 
 // Shutter button click
@@ -62,11 +70,35 @@ function takePhoto() {
     let img = get();
     let data = img.canvas.toDataURL("image/png");
 
-    // Use anchor to trigger download
-    let a = document.createElement("a");
-    a.href = data;
-    a.download = "photo.png";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    // Detect iOS
+    let isIOS =
+        /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+    if (isIOS) {
+        // Show photo in overlay for long-press save
+        const overlay = document.createElement("div");
+        overlay.style.position = "fixed";
+        overlay.style.top = "0";
+        overlay.style.left = "0";
+        overlay.style.width = "100%";
+        overlay.style.height = "100%";
+        overlay.style.background = "black";
+        overlay.style.display = "flex";
+        overlay.style.alignItems = "center";
+        overlay.style.justifyContent = "center";
+        overlay.style.zIndex = "9999";
+        overlay.innerHTML = `<img src="${data}" style="max-width:100%;max-height:100%;object-fit:contain;"><p style="position:absolute;bottom:20px;color:white;text-align:center;width:100%;">Tap and hold the photo to save</p>`;
+        overlay.addEventListener("click", () =>
+            document.body.removeChild(overlay),
+        );
+        document.body.appendChild(overlay);
+    } else {
+        // Normal download for Android / Desktop
+        let a = document.createElement("a");
+        a.href = data;
+        a.download = "photo.png";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
 }
