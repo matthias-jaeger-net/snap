@@ -68,9 +68,6 @@ canvas {
     background: rgba(255, 255, 255, 0.1);
     cursor: pointer;
     transition: background 0.1s;
-
-    /* iOS safe area at bottom */
-    bottom: calc(20px + env(safe-area-inset-bottom));
 }
 #shutter:active {
     background: rgba(255, 255, 255, 0.5);
