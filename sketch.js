@@ -87,7 +87,7 @@ function takePhoto() {
         overlay.style.alignItems = "center";
         overlay.style.justifyContent = "center";
         overlay.style.zIndex = "9999";
-        overlay.innerHTML = `<img src="${data}" style="max-width:100%;max-height:100%;object-fit:contain;"><p style="position:absolute;bottom:20px;color:white;text-align:center;width:100%;">Tap and hold the photo to save</p>`;
+        overlay.innerHTML = `<img src="${data}" style="max-width:100%;max-height:100%;object-fit:contain;"><p style="position:absolute;bottom:20px;color:white;text-align:center;width:100%;font-size:14px;">Tap and hold the photo to save</p>`;
         overlay.addEventListener("click", () =>
             document.body.removeChild(overlay),
         );
