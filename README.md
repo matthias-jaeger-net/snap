@@ -1,0 +1,2 @@
+# snap
+Snap a picture
