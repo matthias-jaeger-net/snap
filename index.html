@@ -86,7 +86,12 @@
 
             function takePhoto() {
                 flash = 255;
-                saveCanvas("photo", "png");
+
+                let img = get(); // capture canvas
+                let data = img.canvas.toDataURL("image/png");
+
+                let w = window.open("");
+                w.document.write('<img src="' + data + '" style="width:100%">');
             }
 
             function windowResized() {
