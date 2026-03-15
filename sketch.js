@@ -128,8 +128,8 @@ function takePhoto() {
         overlay.style.position = "fixed";
         overlay.style.top = "0";
         overlay.style.left = "0";
-        overlay.style.width = "100%";
-        overlay.style.height = "100%";
+        overlay.style.width = "100vw";
+        overlay.style.height = "100vh";
         overlay.style.background = "black";
         overlay.style.display = "flex";
         overlay.style.alignItems = "center";

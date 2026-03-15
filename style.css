@@ -1,7 +1,7 @@
 /* Theme variables */
 :root {
     --camera-bg: #fff;
-    --camera-fg: #000;
+    --camera-fg: #381cf0;
     --accent: #1018ef;
     --accent-soft: rgba(94, 98, 215, 0.5);
 }
