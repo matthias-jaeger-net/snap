@@ -1,6 +1,14 @@
 let cam;
 let flashEl = document.getElementById("flash");
 const shutter = document.getElementById("shutter");
+const overlay = document.getElementById("photo-overlay");
+const overlayImage = document.getElementById("overlay-image");
+const overlayDownload = document.getElementById("overlay-download");
+const overlayClose = document.getElementById("overlay-close");
+
+overlayClose.addEventListener("click", () => {
+    overlay.classList.remove("active");
+});
 
 // Camera container
 const container = document.getElementById("camera-container");
@@ -111,45 +119,14 @@ function windowResized() {
 shutter.addEventListener("click", takePhoto);
 
 function takePhoto() {
-    // Flash effect
     flashEl.style.opacity = 1;
     setTimeout(() => (flashEl.style.opacity = 0), 100);
 
-    // Capture canvas
     let img = get();
     let data = img.canvas.toDataURL("image/png");
 
-    let isIOS =
-        /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    overlayImage.src = data;
+    overlayDownload.href = data;
 
-    if (isIOS) {
-        // Overlay for long-press save
-        const overlay = document.createElement("div");
-        overlay.style.position = "fixed";
-        overlay.style.top = "0";
-        overlay.style.left = "0";
-        overlay.style.width = "100vw";
-        overlay.style.height = "100vh";
-        overlay.style.background = "black";
-        overlay.style.display = "flex";
-        overlay.style.alignItems = "center";
-        overlay.style.justifyContent = "center";
-        overlay.style.zIndex = "9999";
-        overlay.innerHTML = `
-            <img src="${data}" style="max-width:100%;max-height:100%;object-fit:contain;">
-            <p style="position:absolute;bottom:20px;color:white;text-align:center;width:100%;font-size:45px;">
-                Tap and hold the photo to save
-            </p>`;
-        overlay.addEventListener("click", () =>
-            document.body.removeChild(overlay),
-        );
-        document.body.appendChild(overlay);
-    } else {
-        let a = document.createElement("a");
-        a.href = data;
-        a.download = "photo.png";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-    }
+    overlay.classList.add("active");
 }

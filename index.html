@@ -17,7 +17,24 @@
             <div id="shutter"></div>
             <div id="flash"></div>
         </div>
-        <div id="photo-overlay"></div>
+        <div id="photo-overlay">
+            <div class="overlay-inner">
+                <div class="overlay-controls">
+                    <h1>snap</h1>
+                </div>
+
+                <img id="overlay-image" />
+
+                <div class="overlay-controls">
+                    <div class="overlay-buttons">
+                        <button id="overlay-close">Close</button>
+                        <a id="overlay-download" download="photo.png"
+                            >Download image</a
+                        >
+                    </div>
+                </div>
+            </div>
+        </div>
         <script src="sketch.js"></script>
     </body>
 </html>
