@@ -4,6 +4,7 @@
     --camera-fg: #381cf0;
     --accent: #1018ef;
     --accent-soft: rgba(94, 98, 215, 0.5);
+    --overlay-bg: white;
 }
 
 @media (prefers-color-scheme: dark) {
