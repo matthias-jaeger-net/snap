@@ -2,6 +2,9 @@ let cam;
 let flashEl = document.getElementById("flash");
 const shutter = document.getElementById("shutter");
 
+// Camera container
+const container = document.getElementById("camera-container");
+
 // Function to position shutter dynamically
 function positionShutter() {
     const margin = 90; // px above bottom
@@ -29,10 +32,11 @@ function image2Ascii(video, x, y, w, h) {
     video.loadPixels();
     let ascii = "";
     const chars = "@%#*+=-:. "; // dark → light
+
     const charLen = chars.length;
 
     // Grid size
-    const cellH = 18; // height of each ASCII character
+    const cellH = 20; // height of each ASCII character
     const rows = Math.floor(h / cellH);
     const cellW = cellH * 0.6; // approximate monospace width
     const cols = Math.floor(w / cellW);
@@ -58,7 +62,12 @@ function image2Ascii(video, x, y, w, h) {
         ascii += "\n";
     }
 
-    fill(255);
+    // Camera constiner color
+    const style = getComputedStyle(container);
+    const textColor = style.color || "white"; // fallback
+
+    fill(textColor);
+
     textFont("monospace");
     textSize(cellH);
     textLeading(cellH);
@@ -66,7 +75,10 @@ function image2Ascii(video, x, y, w, h) {
 }
 
 function draw() {
-    background(0);
+    // Camera constiner color
+    const style = getComputedStyle(container);
+    const backgroundColor = style.backgroundColor || "black"; // fallback
+    background(backgroundColor);
 
     let canvasRatio = width / height;
     let videoRatio = cam.width / cam.height;
