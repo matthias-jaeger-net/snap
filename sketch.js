@@ -7,7 +7,7 @@ const container = document.getElementById("camera-container");
 
 // Function to position shutter dynamically
 function positionShutter() {
-    const margin = 90; // px above bottom
+    const margin = 20; // px above bottom
     const y = window.innerHeight - shutter.offsetHeight - margin;
     shutter.style.top = `${y}px`;
 }
