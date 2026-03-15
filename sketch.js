@@ -4,8 +4,7 @@ const shutter = document.getElementById("shutter");
 
 // Function to position shutter dynamically
 function positionShutter() {
-    const margin = 90; // px above bottom of viewport
-    // Position relative to visible viewport top
+    const margin = 90; // px above bottom
     const y = window.innerHeight - shutter.offsetHeight - margin;
     shutter.style.top = `${y}px`;
 }
@@ -15,7 +14,6 @@ function setup() {
     const canvas = createCanvas(windowWidth, windowHeight);
     canvas.parent("camera-container");
 
-    // Use rear camera, audio off
     cam = createCapture({
         video: { facingMode: "environment" },
         audio: false,
@@ -23,8 +21,48 @@ function setup() {
     cam.elt.muted = true;
     cam.hide();
 
-    // Initial shutter position
     positionShutter();
+}
+
+// ASCII conversion keeping grid concept
+function image2Ascii(video, x, y, w, h) {
+    video.loadPixels();
+    let ascii = "";
+    const chars = "@%#*+=-:. "; // dark → light
+    const charLen = chars.length;
+
+    // Grid size
+    const cellH = 18; // height of each ASCII character
+    const rows = Math.floor(h / cellH);
+    const cellW = cellH * 0.6; // approximate monospace width
+    const cols = Math.floor(w / cellW);
+
+    // Map each grid cell to video pixels
+    const videoCellW = video.width / cols;
+    const videoCellH = video.height / rows;
+
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            const i = Math.floor(col * videoCellW + videoCellW / 2);
+            const j = Math.floor(row * videoCellH + videoCellH / 2);
+            const index = (j * video.width + i) * 4;
+
+            const r = video.pixels[index];
+            const g = video.pixels[index + 1];
+            const b = video.pixels[index + 2];
+            const avg = (r + g + b) / 3;
+
+            const charIndex = Math.floor(map(avg, 0, 255, charLen - 1, 0));
+            ascii += chars[charIndex];
+        }
+        ascii += "\n";
+    }
+
+    fill(255);
+    textFont("monospace");
+    textSize(cellH);
+    textLeading(cellH);
+    text(ascii, x, y);
 }
 
 function draw() {
@@ -32,7 +70,6 @@ function draw() {
 
     let canvasRatio = width / height;
     let videoRatio = cam.width / cam.height;
-
     let drawWidth, drawHeight;
 
     if (canvasRatio > videoRatio) {
@@ -43,7 +80,7 @@ function draw() {
         drawWidth = height * videoRatio;
     }
 
-    image(
+    image2Ascii(
         cam,
         width / 2 - drawWidth / 2,
         height / 2 - drawHeight / 2,
@@ -52,10 +89,10 @@ function draw() {
     );
 }
 
-// Handle window resize / orientation changes
+// Handle window resize
 function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
-    positionShutter(); // recalc shutter position
+    positionShutter();
 }
 
 // Shutter button click
@@ -66,16 +103,15 @@ function takePhoto() {
     flashEl.style.opacity = 1;
     setTimeout(() => (flashEl.style.opacity = 0), 100);
 
-    // Capture image from canvas
+    // Capture canvas
     let img = get();
     let data = img.canvas.toDataURL("image/png");
 
-    // Detect iOS
     let isIOS =
         /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
     if (isIOS) {
-        // Show photo in overlay for long-press save
+        // Overlay for long-press save
         const overlay = document.createElement("div");
         overlay.style.position = "fixed";
         overlay.style.top = "0";
@@ -87,13 +123,16 @@ function takePhoto() {
         overlay.style.alignItems = "center";
         overlay.style.justifyContent = "center";
         overlay.style.zIndex = "9999";
-        overlay.innerHTML = `<img src="${data}" style="max-width:100%;max-height:100%;object-fit:contain;"><p style="position:absolute;bottom:20px;color:white;text-align:center;width:100%;font-size:45px;">Tap and hold the photo to save</p>`;
+        overlay.innerHTML = `
+            <img src="${data}" style="max-width:100%;max-height:100%;object-fit:contain;">
+            <p style="position:absolute;bottom:20px;color:white;text-align:center;width:100%;font-size:45px;">
+                Tap and hold the photo to save
+            </p>`;
         overlay.addEventListener("click", () =>
             document.body.removeChild(overlay),
         );
         document.body.appendChild(overlay);
     } else {
-        // Normal download for Android / Desktop
         let a = document.createElement("a");
         a.href = data;
         a.download = "photo.png";
