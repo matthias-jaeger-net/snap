@@ -109,7 +109,6 @@ main {
     display: flex;
     justify-content: center;
     align-items: start;
-    padding: 40px 20px;
 
     opacity: 0;
     pointer-events: none;
@@ -126,6 +125,7 @@ main {
 .overlay-inner {
     max-width: 100%;
     max-height: 100%;
+    padding: 20px;
 
     box-sizing: border-box;
 
@@ -135,9 +135,9 @@ main {
 }
 
 #overlay-image {
-    max-width: 100%;
-    max-height: 70vh;
-    object-fit: contain;
+    width: 85%;
+    height: auto;
+    margin: 0 auto;
     border: 1px solid var(--accent);
     border-radius: 12px;
 }
@@ -145,13 +145,13 @@ main {
 .overlay-controls {
     text-align: center;
     color: var(--camera-fg);
-    margin-top: 24px;
+    margin-top: 8px;
 }
 
 .overlay-buttons {
     display: flex;
     justify-content: center;
-    gap: 24px;
+    gap: 8px;
 }
 
 a,
