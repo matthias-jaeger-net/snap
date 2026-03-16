@@ -4,27 +4,33 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Snap</title>
-        <link rel="stylesheet" href="style.css" />
         <meta
             name="apple-mobile-web-app-status-bar-style"
             content="black-translucent"
         />
+        <script src="https://cdn.jsdelivr.net/npm/p5@1.11.11/lib/p5.js"></script>
+        <link rel="stylesheet" href="style.css" />
     </head>
 
     <body>
-        <main>
-            <h1>ASCII camera</h1>
-            <img src="" alt="" />
-            <p>
-                This is a fun little project I made to experiment with p5.js and
-                the webcam. It captures video from your camera, converts it to
-                ASCII art, and allows you to take snapshots. The snapshots can
-                be downloaded as images. It's a playful way to see yourself in a
-                new light!
-            </p>
-            <a href="game.html" class="button">
-                Sanp a picture in ASCII art!
-            </a>
-        </main>
+        <div id="camera-container">
+            <div id="shutter"></div>
+            <div id="flash"></div>
+        </div>
+        <div id="photo-overlay">
+            <div class="overlay-inner">
+                <img id="overlay-image" />
+
+                <div class="overlay-controls">
+                    <div class="overlay-buttons">
+                        <a id="overlay-download" download="photo.png"
+                            >Download</a
+                        >
+                        <button id="overlay-close">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="sketch.js"></script>
     </body>
 </html>

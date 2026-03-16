@@ -35,50 +35,49 @@ function setup() {
     positionShutter();
 }
 
-// ASCII conversion keeping grid concept
 function image2Ascii(video, x, y, w, h) {
     video.loadPixels();
     let ascii = "";
-    const chars = "@%#*+=-:. "; // dark → light
-
+    const chars = "█▓▒░@%#*+=-:. ";
     const charLen = chars.length;
 
-    // Grid size
-    const cellH = 20; // height of each ASCII character
-    const rows = Math.floor(h / cellH);
-    const cellW = cellH * 0.6; // approximate monospace width
-    const cols = Math.floor(w / cellW);
+    const cellH = 14;
+    const cellW = cellH * 0.6;
 
-    // Map each grid cell to video pixels
+    // Ensure grid fills the full region
+    const cols = Math.ceil(w / cellW);
+    const rows = Math.ceil(h / cellH);
+
     const videoCellW = video.width / cols;
     const videoCellH = video.height / rows;
 
     for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
-            const i = Math.floor(col * videoCellW + videoCellW / 2);
-            const j = Math.floor(row * videoCellH + videoCellH / 2);
+            const i = Math.floor(col * videoCellW);
+            const j = Math.floor(row * videoCellH);
+
             const index = (j * video.width + i) * 4;
 
             const r = video.pixels[index];
             const g = video.pixels[index + 1];
             const b = video.pixels[index + 2];
-            const avg = (r + g + b) / 3;
 
+            const avg = (r + g + b) / 3;
             const charIndex = Math.floor(map(avg, 0, 255, charLen - 1, 0));
+
             ascii += chars[charIndex];
         }
         ascii += "\n";
     }
 
-    // Camera constiner color
     const style = getComputedStyle(container);
-    const textColor = style.color || "white"; // fallback
+    const textColor = style.color || "white";
 
     fill(textColor);
-
     textFont("monospace");
     textSize(cellH);
     textLeading(cellH);
+
     text(ascii, x, y);
 }
 
