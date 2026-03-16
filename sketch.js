@@ -15,7 +15,7 @@ const container = document.getElementById("camera-container");
 
 // Function to position shutter dynamically
 function positionShutter() {
-    const margin = 20; // px above bottom
+    const margin = 40; // px above bottom
     const y = window.innerHeight - shutter.offsetHeight - margin;
     shutter.style.top = `${y}px`;
 }
@@ -41,7 +41,7 @@ function image2Ascii(video, x, y, w, h) {
     const chars = "█▓▒░@%#*+=-:. ";
     const charLen = chars.length;
 
-    const cellH = 14;
+    const cellH = 16; // px
     const cellW = cellH * 0.6;
 
     // Ensure grid fills the full region
@@ -53,8 +53,8 @@ function image2Ascii(video, x, y, w, h) {
 
     for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
-            const i = Math.floor(col * videoCellW);
-            const j = Math.floor(row * videoCellH);
+            const i = Math.floor(col * videoCellW + videoCellW * 0.5);
+            const j = Math.floor(row * videoCellH + videoCellH * 0.5);
 
             const index = (j * video.width + i) * 4;
 
