@@ -108,7 +108,8 @@ main {
 
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: start;
+    padding: 40px 20px;
 
     opacity: 0;
     pointer-events: none;
@@ -126,7 +127,6 @@ main {
     max-width: 100%;
     max-height: 100%;
 
-    padding: 8px;
     box-sizing: border-box;
 
     display: flex;
@@ -136,7 +136,7 @@ main {
 
 #overlay-image {
     max-width: 100%;
-    max-height: 75vh;
+    max-height: 70vh;
     object-fit: contain;
     border: 1px solid var(--accent);
     border-radius: 12px;
