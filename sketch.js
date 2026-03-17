@@ -38,10 +38,10 @@ function setup() {
 function image2Ascii(video, x, y, w, h) {
     video.loadPixels();
     let ascii = "";
-    const chars = "█▓▒░@%#*+=-:. ";
+    const chars = "@#/<>*+=-:,.  ";
     const charLen = chars.length;
 
-    const cellH = 16; // px
+    const cellH = 18; // px
     const cellW = cellH * 0.6;
 
     // Ensure grid fills the full region
@@ -117,15 +117,33 @@ function windowResized() {
 // Shutter button click
 shutter.addEventListener("click", takePhoto);
 
-function takePhoto() {
+async function takePhoto() {
     flashEl.style.opacity = 1;
     setTimeout(() => (flashEl.style.opacity = 0), 100);
 
     let img = get();
-    let data = img.canvas.toDataURL("image/png");
+    let dataUrl = img.canvas.toDataURL("image/png");
 
-    overlayImage.src = data;
-    overlayDownload.href = data;
-
+    overlayImage.src = dataUrl;
     overlay.classList.add("active");
+
+    // Convert dataURL to blob
+    const res = await fetch(dataUrl);
+    const blob = await res.blob();
+    const file = new File([blob], "ascii-camera.png", { type: "image/png" });
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+            await navigator.share({
+                files: [file],
+                title: "ASCII Camera Photo",
+            });
+        } catch (err) {
+            console.log("Share cancelled");
+        }
+    } else {
+        // fallback download
+        overlayDownload.href = dataUrl;
+        overlayDownload.download = "ascii-camera.png";
+    }
 }

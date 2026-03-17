@@ -7,6 +7,7 @@
     --overlay-bg: #fff;
     --overlay-fg: #fff;
 }
+
 @media (prefers-color-scheme: dark) {
     :root {
         --camera-bg: rgb(80, 8, 8);
@@ -21,6 +22,8 @@
 * {
     box-sizing: border-box;
     transition: all 0.2s ease-in;
+    margin: 0;
+    padding: 0;
 }
 
 /* Reset body */
@@ -32,12 +35,6 @@ body {
         Cantarell, "Helvetica Neue", sans-serif;
     background-color: var(--camera-bg);
     color: var(--camera-fg);
-}
-
-main {
-    max-width: 600px;
-    margin: 40px auto;
-    padding: 0 20px;
 }
 
 /* Camera container */
@@ -125,7 +122,6 @@ main {
 .overlay-inner {
     max-width: 100%;
     max-height: 100%;
-    padding: 20px;
 
     box-sizing: border-box;
 
@@ -143,44 +139,26 @@ main {
 }
 
 .overlay-controls {
+    width: 100%;
+    padding: 16px 24px;
     text-align: center;
     color: var(--camera-fg);
-    margin-top: 8px;
-}
 
-.overlay-buttons {
     display: flex;
-    justify-content: center;
-    gap: 8px;
+    justify-content: space-between;
 }
 
 a,
 button,
 .overlay-buttons a,
 .overlay-buttons button {
-    flex: 1;
-    padding: 18px 32px;
-
-    border-radius: 6px;
     border: none;
-
-    background: var(--accent);
-    color: var(--overlay-fg);
-
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
+    background: none;
     text-decoration: none;
-}
-
-.overlay-buttons button {
-    background: transparent;
-    border: 2px solid var(--accent);
     color: var(--accent);
 }
 
-.overlay-buttons button:active {
-    background: var(--accent);
-    border: 2px solid var(--accent);
-    color: var(--camera-bg);
+svg {
+    width: 60px;
+    height: 50px;
 }
