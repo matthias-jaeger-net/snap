@@ -52,10 +52,10 @@ function setup() {
 function image2Ascii(video, x, y, w, h) {
     video.loadPixels();
     let ascii = "";
-    const chars = "@#/<>*+=-:,.  ";
+    const chars = " @#=:. ";
     const charLen = chars.length;
 
-    const cellH = 18;
+    const cellH = 12;
     const cellW = cellH * 0.6;
 
     const cols = Math.ceil(w / cellW);
