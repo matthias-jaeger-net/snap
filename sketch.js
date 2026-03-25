@@ -1,15 +1,48 @@
 let cam;
-let facingMode = "environment"; // start with back camera
+let facingMode = "environment";
+
+let asciiMode = true;
+let invertMode = false;
 
 let flashEl = document.getElementById("flash");
 const shutter = document.getElementById("shutter");
 const switchBtn = document.getElementById("switch-camera");
+
+const asciiToggle = document.getElementById("ascii-toggle");
+const invertToggle = document.getElementById("invert-toggle");
 
 const overlay = document.getElementById("photo-overlay");
 const overlayImage = document.getElementById("overlay-image");
 const overlayDownload = document.getElementById("overlay-download");
 const overlayClose = document.getElementById("overlay-close");
 
+// Init toggles
+asciiToggle.checked = true;
+invertToggle.checked = false;
+
+const settingsOverlay = document.getElementById("settings-overlay");
+const openSettings = document.getElementById("open-settings");
+const closeSettings = document.getElementById("close-settings");
+
+// open
+openSettings.addEventListener("click", () => {
+    settingsOverlay.classList.add("active");
+});
+
+// close
+closeSettings.addEventListener("click", () => {
+    settingsOverlay.classList.remove("active");
+});
+
+asciiToggle.addEventListener("change", () => {
+    asciiMode = asciiToggle.checked;
+});
+
+invertToggle.addEventListener("change", () => {
+    invertMode = invertToggle.checked;
+});
+
+// Close overlay
 overlayClose.addEventListener("click", () => {
     overlay.classList.remove("active");
 });
@@ -17,18 +50,16 @@ overlayClose.addEventListener("click", () => {
 // Camera container
 const container = document.getElementById("camera-container");
 
-// Function to position shutter dynamically
+// Position shutter
 function positionShutter() {
     const margin = 40;
     const y = window.innerHeight - shutter.offsetHeight - margin;
     shutter.style.top = `${y}px`;
 }
 
-// 🔁 Camera setup function
+// Init camera
 function initCamera() {
-    if (cam) {
-        cam.remove(); // stop previous stream
-    }
+    if (cam) cam.remove();
 
     cam = createCapture({
         video: { facingMode: facingMode },
@@ -39,7 +70,7 @@ function initCamera() {
     cam.hide();
 }
 
-// Setup p5 canvas
+// Setup
 function setup() {
     const canvas = createCanvas(windowWidth, windowHeight);
     canvas.parent("camera-container");
@@ -48,14 +79,14 @@ function setup() {
     positionShutter();
 }
 
-// ASCII conversion
-function image2Ascii(video, x, y, w, h) {
+// ASCII render
+function image2Ascii(video, x, y, w, h, fgColor) {
     video.loadPixels();
-    let ascii = "";
-    const chars = " @#=:. ";
+
+    const chars = "@%#*+=-:. ";
     const charLen = chars.length;
 
-    const cellH = 12;
+    const cellH = 16;
     const cellW = cellH * 0.6;
 
     const cols = Math.ceil(w / cellW);
@@ -63,6 +94,8 @@ function image2Ascii(video, x, y, w, h) {
 
     const videoCellW = video.width / cols;
     const videoCellH = video.height / rows;
+
+    let ascii = "";
 
     for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
@@ -75,18 +108,23 @@ function image2Ascii(video, x, y, w, h) {
             const g = video.pixels[index + 1];
             const b = video.pixels[index + 2];
 
-            const avg = (r + g + b) / 3;
-            const charIndex = Math.floor(map(avg, 0, 255, charLen - 1, 0));
+            // better luminance
+            const avg = 0.299 * r + 0.587 * g + 0.114 * b;
+
+            let charIndex;
+
+            if (invertMode) {
+                charIndex = Math.floor(map(avg, 0, 255, 0, charLen - 1));
+            } else {
+                charIndex = Math.floor(map(avg, 0, 255, charLen - 1, 0));
+            }
 
             ascii += chars[charIndex];
         }
         ascii += "\n";
     }
 
-    const style = getComputedStyle(container);
-    const textColor = style.color || "white";
-
-    fill(textColor);
+    fill(fgColor);
     textFont("monospace");
     textSize(cellH);
     textLeading(cellH);
@@ -97,8 +135,18 @@ function image2Ascii(video, x, y, w, h) {
 // Draw loop
 function draw() {
     const style = getComputedStyle(container);
-    const backgroundColor = style.backgroundColor || "black";
-    background(backgroundColor);
+
+    let bg = style.backgroundColor || "black";
+    let fg = style.color || "white";
+
+    // invert colors
+    if (invertMode) {
+        const temp = bg;
+        bg = fg;
+        fg = temp;
+    }
+
+    background(bg);
 
     let canvasRatio = width / height;
     let videoRatio = cam.width / cam.height;
@@ -114,30 +162,41 @@ function draw() {
 
     push();
 
-    // 👈 Mirror front camera
+    // mirror front camera
     if (facingMode === "user") {
         translate(width, 0);
         scale(-1, 1);
     }
 
-    image2Ascii(
-        cam,
-        width / 2 - drawWidth / 2,
-        height / 2 - drawHeight / 2,
-        drawWidth,
-        drawHeight,
-    );
+    if (asciiMode) {
+        image2Ascii(
+            cam,
+            width / 2 - drawWidth / 2,
+            height / 2 - drawHeight / 2,
+            drawWidth,
+            drawHeight,
+            fg,
+        );
+    } else {
+        image(
+            cam,
+            width / 2 - drawWidth / 2,
+            height / 2 - drawHeight / 2,
+            drawWidth,
+            drawHeight,
+        );
+    }
 
     pop();
 }
 
-// Handle resize
+// Resize
 function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
     positionShutter();
 }
 
-// 📸 Take photo
+// Take photo
 shutter.addEventListener("click", takePhoto);
 
 async function takePhoto() {
@@ -160,7 +219,7 @@ async function takePhoto() {
                 files: [file],
                 title: "ASCII Camera Photo",
             });
-        } catch (err) {
+        } catch {
             console.log("Share cancelled");
         }
     } else {
@@ -169,7 +228,7 @@ async function takePhoto() {
     }
 }
 
-// 🔄 Switch camera button
+// Switch camera
 switchBtn.addEventListener("click", () => {
     facingMode = facingMode === "environment" ? "user" : "environment";
     initCamera();

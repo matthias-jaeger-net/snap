@@ -15,7 +15,7 @@
         --accent: orange;
         --accent-soft: rgba(255, 165, 0, 0.5);
         --overlay-bg: rgb(53, 20, 20);
-        --overlay-fg: rgb(53, 20, 20);
+        --overlay-fg: orange;
     }
 }
 
@@ -51,6 +51,15 @@ body {
     position: absolute;
     top: 20px;
     right: 20px;
+    z-index: 10;
+    border-radius: 50%;
+    background: var(--camera-bg);
+}
+
+#open-settings {
+    position: absolute;
+    top: 20px;
+    left: 20px;
     z-index: 10;
     border-radius: 50%;
     background: var(--camera-bg);
@@ -170,4 +179,26 @@ button,
 svg {
     width: 60px;
     height: 50px;
+}
+
+.settings-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--overlay-bg);
+    color: var(--overlay-fg);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 20;
+}
+
+.settings-overlay.active {
+    display: flex;
+}
+
+.settings-inner {
+    padding: 20px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 320px;
 }
