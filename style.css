@@ -47,6 +47,14 @@ body {
     color: var(--camera-fg);
 }
 
+#switch-camera {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+    background: white;
+}
+
 /* Canvas fills container */
 #camera-container canvas {
     position: absolute;

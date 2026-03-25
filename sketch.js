@@ -1,6 +1,10 @@
 let cam;
+let facingMode = "environment"; // start with back camera
+
 let flashEl = document.getElementById("flash");
 const shutter = document.getElementById("shutter");
+const switchBtn = document.getElementById("switch-camera");
+
 const overlay = document.getElementById("photo-overlay");
 const overlayImage = document.getElementById("overlay-image");
 const overlayDownload = document.getElementById("overlay-download");
@@ -15,9 +19,24 @@ const container = document.getElementById("camera-container");
 
 // Function to position shutter dynamically
 function positionShutter() {
-    const margin = 40; // px above bottom
+    const margin = 40;
     const y = window.innerHeight - shutter.offsetHeight - margin;
     shutter.style.top = `${y}px`;
+}
+
+// 🔁 Camera setup function
+function initCamera() {
+    if (cam) {
+        cam.remove(); // stop previous stream
+    }
+
+    cam = createCapture({
+        video: { facingMode: facingMode },
+        audio: false,
+    });
+
+    cam.elt.muted = true;
+    cam.hide();
 }
 
 // Setup p5 canvas
@@ -25,26 +44,20 @@ function setup() {
     const canvas = createCanvas(windowWidth, windowHeight);
     canvas.parent("camera-container");
 
-    cam = createCapture({
-        video: { facingMode: "environment" },
-        audio: false,
-    });
-    cam.elt.muted = true;
-    cam.hide();
-
+    initCamera();
     positionShutter();
 }
 
+// ASCII conversion
 function image2Ascii(video, x, y, w, h) {
     video.loadPixels();
     let ascii = "";
     const chars = "@#/<>*+=-:,.  ";
     const charLen = chars.length;
 
-    const cellH = 18; // px
+    const cellH = 18;
     const cellW = cellH * 0.6;
 
-    // Ensure grid fills the full region
     const cols = Math.ceil(w / cellW);
     const rows = Math.ceil(h / cellH);
 
@@ -81,10 +94,10 @@ function image2Ascii(video, x, y, w, h) {
     text(ascii, x, y);
 }
 
+// Draw loop
 function draw() {
-    // Camera constiner color
     const style = getComputedStyle(container);
-    const backgroundColor = style.backgroundColor || "black"; // fallback
+    const backgroundColor = style.backgroundColor || "black";
     background(backgroundColor);
 
     let canvasRatio = width / height;
@@ -99,6 +112,14 @@ function draw() {
         drawWidth = height * videoRatio;
     }
 
+    push();
+
+    // 👈 Mirror front camera
+    if (facingMode === "user") {
+        translate(width, 0);
+        scale(-1, 1);
+    }
+
     image2Ascii(
         cam,
         width / 2 - drawWidth / 2,
@@ -106,15 +127,17 @@ function draw() {
         drawWidth,
         drawHeight,
     );
+
+    pop();
 }
 
-// Handle window resize
+// Handle resize
 function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
     positionShutter();
 }
 
-// Shutter button click
+// 📸 Take photo
 shutter.addEventListener("click", takePhoto);
 
 async function takePhoto() {
@@ -127,7 +150,6 @@ async function takePhoto() {
     overlayImage.src = dataUrl;
     overlay.classList.add("active");
 
-    // Convert dataURL to blob
     const res = await fetch(dataUrl);
     const blob = await res.blob();
     const file = new File([blob], "ascii-camera.png", { type: "image/png" });
@@ -142,8 +164,13 @@ async function takePhoto() {
             console.log("Share cancelled");
         }
     } else {
-        // fallback download
         overlayDownload.href = dataUrl;
         overlayDownload.download = "ascii-camera.png";
     }
 }
+
+// 🔄 Switch camera button
+switchBtn.addEventListener("click", () => {
+    facingMode = facingMode === "environment" ? "user" : "environment";
+    initCamera();
+});
